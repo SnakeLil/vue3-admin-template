@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <svg-icon name="home" color="gray" width="40px" height="40px"/>
-
+  <div class="app">
+    
+    <router-view></router-view>
   </div>
 </template>
 

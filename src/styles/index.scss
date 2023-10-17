@@ -1,2 +1,17 @@
-@import './reset.scss'
+@import './reset.scss';
 
+@mixin mobile {
+    @media  (max-width: 850px) {
+        @content;
+    }
+}
+@mixin tablet {
+    @media (min-width: 850px) and (max-width: 1150px) {
+        @content;
+    }
+}
+@mixin desktop {
+    @media (min-width: 1150px) {
+        @content;
+    }
+}
