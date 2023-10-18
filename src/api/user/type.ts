@@ -7,7 +7,8 @@ export interface loginForm {
 export interface loginRes {
     code: number;
     data: {
-        token: string;
+        token?: string;
+        message?: string;
     };
 }
 

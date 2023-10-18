@@ -27,13 +27,39 @@
 </template>
 
 <script setup lang="ts">
-import {reactive,onMounted} from 'vue'
+import {reactive} from 'vue'
+import useUserStore from '@/store/modules/user.ts'
+import {useRouter} from 'vue-router'
+import {ElNotification} from 'element-plus'
+import { ElLoading } from 'element-plus'
+import {getTime} from '@/utils/time'
+let $router = useRouter()
+let userStore = useUserStore()
 let user = reactive({
     username:'admin',
     password:'111111',
 })
-const handleLogin = ()=>{
-    console.log(user)
+// const loadingInstance = ElLoading.service(options)
+const handleLogin = async ()=>{
+    const loadingInstance = ElLoading.service({ body:true,})
+    try {
+         await userStore.userLogin(user)
+        $router.push('/')
+        ElNotification({
+            type:'success',
+            message:'登录成功',
+            title:getTime()
+        })
+        loadingInstance.close()
+    } catch (error) {
+        console.log(error)
+        loadingInstance.close()
+        ElNotification({
+            type:'error',
+            message:(error as Error).message
+        })
+        
+    }
 }
 </script>
 
