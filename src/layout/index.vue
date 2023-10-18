@@ -2,8 +2,10 @@
     <div class="layout-container">
         <div class="layout-left">
             <logo></logo>
-            
-            <Menu :menuList="useStore.menuRoutes"></Menu>
+            <div class="menu">
+                <Menu :menuList="useStore.menuRoutes"></Menu>
+            </div>
+
         </div>
         <div class="layout-right">
             <div class="layout-nav">
@@ -19,7 +21,9 @@
             </div>
 
             <div class="layout-content">
-
+                <!-- 内容区 -->
+                
+                <Main></Main>
             </div>
         </div>
 
@@ -27,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import Main from './main/index.vue'
 import logo from '@/layout/logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
 import useUserStore from '@/store/modules/user.ts'
@@ -40,14 +45,25 @@ let useStore = useUserStore()
     height: 100vh;
     display: flex;
 
-
-
     .layout-left {
         padding: 20px;
         width: $menu-width;
         height: 100%;
         background-color: rgb(255, 255, 255);
         border-right: 1px solid #d0cfcf;
+
+        .menu {
+            padding: 33.5px 0;
+            width: 100%;
+            height: 100%;
+
+            overflow: auto;
+
+            .el-menu {
+                border-right: none;
+                border-top: 1px solid rgb(189, 187, 187);
+            }
+        }
 
         ::-webkit-scrollbar {
             width: 7x;
@@ -110,6 +126,7 @@ let useStore = useUserStore()
 
 
     }
+
 
 }
 </style>
