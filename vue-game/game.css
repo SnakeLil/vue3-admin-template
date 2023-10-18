@@ -1,0 +1,37 @@
+.vue-app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+}
+.bag {
+    width: 200px;
+    height: 500px;
+    background: url(./img/bag.png) center no-repeat;
+}
+.bust {
+
+    background: url(./img/bag-burst.png) center no-repeat;
+}
+.health {
+    background-color: aliceblue;
+    border: 1px solid black;
+    width: 250px;
+    
+}
+.health div {
+    height: 30px;
+    background-color: red;
+}
+.controls button {
+    width: fit-content;
+    padding: 20px 30px;
+    background-color: aliceblue;
+    border-radius: 5px;
+    border: none;
+    margin: 20px;
+
+}

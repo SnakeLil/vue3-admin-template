@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <h1 v-bind:title="message ">hello </h1>
+        <h2 v-if="seen">你好_{{message}}</h2>
+        <h3>进入时间：{{Date}}</h3>
+        <span v-for="item in todos" style="display: block;">
+            {{ item.text }}
+        </span>
+        <button v-on:click="hello">hello</button>
+        <input v-model="message">
+        <button v-bind:disabled="isButtonDisabled" v-on:click="isButtonDisabled = !isButtonDisabled">Button</button>
+    </div>
+
+
+</body>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            Date:Date(Date.now()),
+            message: 'Hello Vue!',
+            seen: true,
+            isButtonDisabled:false,
+            todos: [
+                { text: '学习 JavaScript' },
+                { text: '学习 Vue' },
+                { text: '整个牛项目' }
+            ]
+        },
+        methods: {
+            hello: function () {
+                this.message = '你好'
+                // this.seen = false
+                console.log('hello')
+            }
+        }
+
+    })
+    app.todos.push({ text: '整个最牛逼的项目' })
+</script>
+
+</html>
