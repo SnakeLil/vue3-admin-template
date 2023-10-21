@@ -37,13 +37,13 @@ let $router = useRouter()
 let userStore = useUserStore()
 let user = reactive({
     username:'admin',
-    password:'111111',
+    password:'atguigu123',
 })
 // const loadingInstance = ElLoading.service(options)
 const handleLogin = async ()=>{
     const loadingInstance = ElLoading.service({ body:true,})
     try {
-         await userStore.userLogin(user)
+       await userStore.userLogin(user)
         $router.push('/')
         ElNotification({
             type:'success',

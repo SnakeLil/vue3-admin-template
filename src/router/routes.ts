@@ -4,10 +4,9 @@ export  const constantRoutes = [
         component:()=>import('@/views/home/index.vue'),
         name:'layout',
         meta:{
-            title:'首页',
-            icon:'House'
+
         },
-        
+        redirect:'/home',
         children:[
             {
                 path:'/home',
@@ -79,6 +78,7 @@ export  const constantRoutes = [
             title:'权限管理',
             icon:'Operation'
         },
+        redirect:'/acl/user',
         children:[
             {
                 path:'/acl/user',
@@ -120,6 +120,7 @@ export  const constantRoutes = [
             title:'商品管理',
             icon:'Shop'
         },
+        redirect:'/product/trademark',
         children:[
             {
                 path:'/product/trademark',
@@ -166,8 +167,6 @@ export  const constantRoutes = [
         component:()=>import('@/views/home/index.vue'),
         name:'setting',
         meta:{
-            title:'设置',
-            icon:'Setting'
         },
         children:[
             {

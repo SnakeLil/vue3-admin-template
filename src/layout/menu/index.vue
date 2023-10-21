@@ -1,13 +1,13 @@
 <template>
-    <el-menu default-active="2" class="el-menu-vertical-demo">
+    <el-menu :default-active="route.path" class="el-menu-vertical-demo" >
         <template v-for="(item) in menuList" :key="item.path">
             <!-- 没有子节点 -->
             <template v-if="!item.children">
                 <el-menu-item :index="item.path" v-if="!item.meta?.hidden" @click="goRoute">
-                    <template #title>
-                        <el-icon>
+                    <el-icon>
                             <component :is="item.meta.icon"></component>
                         </el-icon>
+                    <template #title>
                         <span>{{ item.meta?.title }}</span>
                     </template>
                 </el-menu-item>
@@ -15,10 +15,10 @@
             <!-- 一个子节点，按没有子节点显示 -->
             <template v-if="item.children && item.children.length === 1">
                 <el-menu-item :index="item.children[0].path" v-if="!item.children[0]?.meta?.hidden" @click="goRoute">
-                    <template #title>
-                        <el-icon>
+                    <el-icon>
                             <component :is="item.children[0].meta.icon"></component>
                         </el-icon>
+                    <template #title>
                         <span>{{ item?.children[0].meta?.title }}</span>
                     </template>
                 </el-menu-item>
@@ -46,8 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 let $router = useRouter()
+let route = useRoute()
+
 defineProps([
     'menuList',
 ])

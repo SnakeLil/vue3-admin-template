@@ -8,21 +8,14 @@
 
         </div>
         <div class="layout-right">
+
             <div class="layout-nav">
-                <div class="left">
-
-                </div>
-                <div class="right">
-                    <div class="user">
-                        <img src="" alt="">
-                        <span>username</span>
-                    </div>
-                </div>
+                <!-- 顶部导航 -->
+                <Navbar />
             </div>
-
             <div class="layout-content">
                 <!-- 内容区 -->
-                
+
                 <Main></Main>
             </div>
         </div>
@@ -35,7 +28,7 @@ import Main from './main/index.vue'
 import logo from '@/layout/logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
 import useUserStore from '@/store/modules/user.ts'
-
+import Navbar from './navbar/index.vue'
 let useStore = useUserStore()
 </script>
 
@@ -89,38 +82,14 @@ let useStore = useUserStore()
         .layout-nav {
             width: calc(100vw - $menu-width);
             height: $nav-height;
-            background-color: rgb(252, 252, 252);
-            border-bottom: 1px solid #e6e6e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
 
-            .left {}
-
-            .right {
-
-                .user {
-                    display: flex;
-                    align-items: center;
-                    gap: 15px;
-
-                    img {
-                        width: 35px;
-                        height: 35px;
-                        border-radius: 50%;
-
-                    }
-
-                }
-            }
         }
 
         .layout-content {
             padding: 20px;
             width: calc(100vw - $menu-width);
             height: calc(100vh - $nav-height);
-            background-color: #d0cfcf;
+           
             overflow: auto;
         }
 
