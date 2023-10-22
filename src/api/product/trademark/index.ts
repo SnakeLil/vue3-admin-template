@@ -6,7 +6,7 @@ enum API {
     TRADEMARK_LIST = '/admin/product/baseTrademark/',
     ADD_TRADEMARK = '/admin/product/baseTrademark/save',
     UPDATE_TRADEMARK = '/admin/product/baseTrademark/update',
-    DELETE_TRADEMARK = '/admin/product/baseTrademark/delete',
+    DELETE_TRADEMARK = '/admin/product/baseTrademark/remove/',
 }
 
 // 接口方法
@@ -23,5 +23,10 @@ export const AddOrUpdateTrademark = (data:Trademark)=>{
         return request.post<any,any>(API.ADD_TRADEMARK,data);
     }
    
+}
+
+// 删除
+export const deleteTrandemark = (id:number)=>{
+    return request.delete<any,any>(API.DELETE_TRADEMARK+id);
 }
 
