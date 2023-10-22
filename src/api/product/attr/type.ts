@@ -19,6 +19,7 @@ export interface attrValue{
     id?:number,
     valueName:string,
     attrId?:number,
+    isBlur?:boolean
 }
 // 属性值数组
 export type AttrValueList = attrValue[];
