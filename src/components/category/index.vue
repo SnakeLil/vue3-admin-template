@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted,onBeforeUnmount } from 'vue'
 import  useCategoryStore  from '@/store/modules/category.ts';
 defineProps(['scene'])
 let categoryStore = useCategoryStore()
@@ -44,7 +44,9 @@ const handleC2Change = (c2Id: number) =>{
     categoryStore.c2Change(c2Id)
     categoryStore.c3Id = ''
 }
-
+onBeforeUnmount(()=>{
+    categoryStore.$reset()
+})
 
 </script>
 

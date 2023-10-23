@@ -64,7 +64,7 @@ import { InfoFilled } from '@element-plus/icons-vue'
 import { ref, onMounted, reactive, nextTick } from 'vue';
 import { TrandemarkList, AddOrUpdateTrademark ,deleteTrandemark} from '@/api/product/trademark'
 import { TrademarkList as TrademarkListType, Records, Trademark } from '@/api/product/trademark/type'
-import { ElMessage, type UploadProps } from 'element-plus'
+import { ElMessage, type UploadProps ,ElLoading} from 'element-plus'
 
 // 对话框显示/隐藏
 const dialogVisible = ref(false)
@@ -143,11 +143,14 @@ const updateTrademark = (trademark: Trademark) => {
 }
 // 点击删除品牌
 const deleteTrademark = async(id:number) => {
+    const loadingInstance = ElLoading.service({ target: '#category', text: 'loading' })
    let res =  await deleteTrandemark(id)
    if(res.code == 200) {
+    loadingInstance.close()
     ElMessage({ type: 'success', message: '删除成功' })
     getTrademarkList()
    }else {
+    loadingInstance.close()
     ElMessage({ type: 'error', message: '删除失败' })
    }
 
@@ -158,6 +161,7 @@ const cancel = () => {
 }
 // 点击   对话框确认按钮 /确认修改/添加
 const confirm = async () => {
+    const loadingInstance = ElLoading.service({ target: '#category', text: 'loading' })
     // 表单校验
     await formRef.value?.validate()
     // 校验表单
@@ -168,11 +172,12 @@ const confirm = async () => {
         } else {
             ElMessage.success('添加成功')
         }
-
+        loadingInstance.close()
         getTrademarkList()
         dialogVisible.value = false
 
     } else {
+        loadingInstance.close()
         if (newTrademark.id) {
             ElMessage.error('修改失败')
         } else {
