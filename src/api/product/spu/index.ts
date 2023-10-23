@@ -1,11 +1,15 @@
 // spu相关接口
 import  request  from '@/utils/request';
-import type {SpuResData,TrademarkResData,SpuImageResData,SpuSaleAttrResData,AllSaleAttrResData} from './type'
+import type {spuData,SpuResData,TrademarkResData,SpuImageResData,SpuSaleAttrResData,AllSaleAttrResData} from './type'
 enum API {
     SPU_LIST = '/admin/product/',
-    SPU_ADD = '/admin/product/spuInfo/saveSpuInfo', 
-    SPU_INFO = '/admin/product/getSpuById/{spuId}',
+
+    SPU_ADD = '/admin/product/saveSpuInfo', 
+    SPU_UPDATE = '/admin/product/updateSpuInfo',
     SPU_DELETE = '/admin/product/deleteSpu/{spuId}',
+
+    SPU_INFO = '/admin/product/getSpuById/{spuId}',
+
     ALL_TRADEMARK_LIST = '/admin/product/baseTrademark/getTrademarkList',
     SPU_IMAGE_LIST = '/admin/product/spuImageList/',
     SPU_SALE_LIST = '/admin/product/spuSaleAttrList/',
@@ -23,11 +27,19 @@ export const getAllTrademarkList = () => {
 export const getSpuImageList = (spuId: number) => {
     return request.get<any,SpuImageResData>(API.SPU_IMAGE_LIST+spuId);
 }
-// 根据获取某个spu的销售属性列表
+// 根据id获取某个spu的销售属性列表
 export const getSpuSaleList = (spuId: number) => {
     return request.get<any,SpuSaleAttrResData>(API.SPU_SALE_LIST+spuId);
 }
 // 获取全部销售属性
 export const getAllSaleAttrList = () => {
     return request.get<any,AllSaleAttrResData>(API.ALL_SALE_ATTR_LIST);
+}
+// 添加spu,// 修改/更新spu
+export const addOrUpdateSpu = (spuInfo: spuData) => {
+    if(spuInfo.id) {
+        return request.post<any,any>(API.SPU_UPDATE,spuInfo);
+    }else {
+        return request.post<any,any>(API.SPU_ADD,spuInfo);
+    }
 }

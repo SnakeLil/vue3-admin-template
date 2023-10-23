@@ -28,7 +28,7 @@
                             <div style="width: 100%;height: 100%;display: flex;">
                             </div>
                             <el-button type="success" icon="Plus" size="mini" title="添加SKU" @click="handleAddSku"></el-button>
-                            <el-button type="info" plain icon="Edit" size="mini" title="修改此SPU" @click="updateSpu"></el-button>
+                            <el-button type="info" plain icon="Edit" size="mini" title="修改此SPU" @click="updateSpu(row)"></el-button>
                             <el-button icon="View" size="mini" title="查看所有sku"></el-button>
                             <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" :icon="InfoFilled"
                                 icon-color="#626AEF" :title="`确定删除吗?`" @confirm="">
@@ -46,7 +46,7 @@
                     :disabled="categoryStore.c3Id ? false : true" @size-change="getSpuData" @current-change="getSpuData" />
             </div>
             <!-- 添加/修改spu的组件 -->
-            <spu-form v-show="compFlag === 1" @changeToList="changeToList()"></spu-form>
+            <spu-form v-show="compFlag === 1" @changeToList="changeToList()" ref="spu"></spu-form>
             <!-- 添加sku的组件 -->
             <sku-form v-show="compFlag === 2"></sku-form>
         </el-card>
@@ -72,6 +72,8 @@ let pageLimit = ref<number>(5)
 let spuList = ref<spuData[]>()
 let total = ref<number>()
 let categoryStore = useCategoryStore()
+// 获取子组件vc实例
+let spu = ref<any>()
 watch(() => categoryStore.c3Id, () => {
     if (categoryStore.c3Id) {
         getSpuData()
@@ -104,9 +106,11 @@ const handleAddSpu =()=>{
     scene.value = false
 }
 // 点击修改已有的spu
-const updateSpu = ()=>{
+const updateSpu = (row:spuData)=>{
     compFlag.value = 1
     scene.value = false
+    // 获取到子组件的vc实例，调用子组件的getSpuData方法，将row传给子组件，子组件通过row获取到spu数据
+    spu.value.getSpuData(row)
 }
 // 点击添加sku
 const handleAddSku = ()=>{

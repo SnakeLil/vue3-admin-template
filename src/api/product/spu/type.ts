@@ -7,15 +7,15 @@ export interface SpuResData {
     data: Data;
     ok: boolean;
 }
-
+//spu 新增/修改需要传入的数据类型  ,spu对象的 数据类型
 export interface spuData {
-    id?: number;
+    id?:number
     spuName: string;
+    tmId: number | string;//品牌
     description: string;
     category3Id: number | string;
-    tmId: number;//品牌
-    spuSaleAttrList?: any;
-    spuImageList?: any;
+    spuImageList:SpuImage[] | null
+    spuSaleAttrList:SpuSaleAttr[] | null
 }
 export interface Data {
     records: spuData[];
@@ -25,6 +25,12 @@ export interface Data {
     searchCount: boolean;
     pages: number;
 }
+
+
+
+
+
+
 // 品牌数据的类型
 export interface Trademark {
     id: number,
@@ -40,12 +46,14 @@ export interface TrademarkResData {
 }
 // spu下的图片列表的数据类型
 export interface SpuImage {
-    id: number,
-    createTime: string,
-    updateTime: string,
-    imgName: string,
-    imgUrl: string,
-    spuId: number,
+    id?: number,
+    createTime?: string,
+    updateTime?: string,
+    imgName?: string,
+    imgUrl?: string,
+    spuId?: number,
+    name?: string,
+    url?: string,
 }
 export interface SpuImageResData {
     code: number;
@@ -57,19 +65,19 @@ export interface SpuImageResData {
 // spu的销售属性列表返回的类型
 export interface SpuSaleAttrValue {
     id?: number,
-    createTime: any,
-    updateTime: any,
-    spuId: number,
+    createTime?: any,
+    updateTime?: any,
+    spuId?: number,
     baseSaleAttrId: number,
     saleAttrName: string,
-    saleAttrValueName: string,
-    isChecked: any,
+    saleAttrValueName?: string,
+    isChecked?: any,
 }
 export interface SpuSaleAttr {
     id?: number,
-    createTime: any,
-    updateTime: any,
-    spuId: number,
+    createTime?: any,
+    updateTime?: any,
+    spuId?: number,
     baseSaleAttrId: number,
     saleAttrName: string,
     spuSaleAttrValueList: SpuSaleAttrValue[],
