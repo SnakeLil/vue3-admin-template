@@ -27,11 +27,15 @@
                 </el-dialog>
             </el-form-item>
             <el-form-item label="SPU销售属性">
+                <!-- 销售属性 -->
                 <el-select :placeholder="`还有${allSaleAttrList?.length - spuSaleList?.length}种销售属性未选择`"
-                    v-model="allSaleAttrValue">
-                    <el-option :label="item.name" :value="item.id" v-for="item in allSaleAttrList" />
+                    v-model="spuSaleAttrValue">
+                    <el-option :label="item.name" :value="`${item.id}:${item.name}`" 
+                    v-for="item in restSaleAttrList"
+                        :key="item.id" />
                 </el-select>
-                <el-button type="info" icon="Plus" style="margin-left: 15px;">添加属性值</el-button>
+                <el-button @click="handleAddAttr" :disabled="spuSaleAttrValue ? false : true" type="info" icon="Plus"
+                    style="margin-left: 15px;">添加属性</el-button>
                 <el-table border style="margin-top: 20px;" :data="spuSaleList">
                     <el-table-column type="index" label="序号" width="100" align="center"></el-table-column>
                     <el-table-column prop="prop" label="属性名" width="200" align="center">
@@ -43,15 +47,28 @@
                     </el-table-column>
                     <el-table-column prop="prop" label="属性值" width="width" align="center">
                         <template #="{ row }">
-                            <el-tag style="margin: 0 5px;" v-for="item in row.spuSaleAttrValueList">{{
-                                item.saleAttrValueName }}</el-tag>
+                            <div style="width: 100%;height: 100%;display: flex; align-items: center; flex-wrap: wrap;">
+                                <el-tag closable style="margin: 0 5px;" v-for="(item,index) in row.spuSaleAttrValueList"
+                                    :key="item.id" @close="row.spuSaleAttrValueList.splice(index,1)">
+                                    {{ item.saleAttrValueName }}
+                                </el-tag>
+                                <el-input v-model="row.saleAttrValue" @blur="attrValueBlur(row)"  
+                                v-if="row.flag" placeholder="属性值" 
+                                style="width: 60px;margin: 0 5px;"
+                                ref="inputRef"
+                                    class="ml-1 w-20" size="small" />
+                                <el-button v-else class="button-new-tag ml-1" @click="handleAddAttrValue(row)" size="small">
+                                    + 添加
+                                </el-button>
+                            </div>
+
                         </template>
                     </el-table-column>
                     <el-table-column prop="prop" label="操作" width="width" align="center">
-                        <template #="{ row }">
+                        <template #="{ row, $index }">
                             <div style="width: 100%;height: 100%;display: flex;justify-content: center;gap: 30px;">
                                 <el-button icon="Edit">编辑</el-button>
-                                <el-button type="info" icon="Delete">删除</el-button>
+                                <el-button type="info" icon="Delete" @click="handleDelete($index)">删除</el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -66,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed ,nextTick} from 'vue'
 import type { TrademarkResData, SpuImageResData, SpuSaleAttrResData, AllSaleAttrResData } from '@/api/product/spu/type'
 import { getAllTrademarkList, getSpuImageList, getSpuSaleList, getAllSaleAttrList, } from '@/api/product/spu/index'
 import type { spuData as spuType, Trademark, SpuImage, SpuSaleAttr, SaleAttrValue } from '@/api/product/spu/type'
@@ -88,15 +105,22 @@ let spuImageList = ref<SpuImage[]>([])
 
 // 销售属性列表
 let spuSaleList = ref<SpuSaleAttr[]>([])
-
+let spuSaleAttrValue = ref<string>('')
 // 所有销售属性列表
 let allSaleAttrList = ref<SaleAttrValue[]>([])
-let allSaleAttrValue = ref<number | string>('')
-// 通过判断销售属性列表中的baseSaleAttrId是否和所有销售属性列表中的id相同，相同则过滤
 
+// 通过判断销售属性列表中的baseSaleAttrId是否和所有销售属性列表中的id相同，相同则过滤
+let restSaleAttrList = computed(()=>{
+    let unSelectArr =  allSaleAttrList.value.filter(item => {
+        return spuSaleList.value.every(SpuItem => SpuItem.baseSaleAttrId !== item.id)
+    })
+    return unSelectArr
+})
 // 控制照片dialog的显示与隐藏
 let dialogVisible = ref<boolean>(false)
 let dialogImageUrl = ref<string>('')
+// 获取销售属性值input的vc实例
+const inputRef = ref<any>()
 const cancel = () => {
     $emit('changeToList')
 }
@@ -150,7 +174,7 @@ const handleRemove = (file: any) => {
 
 }
 const beforeAvatarUpload = (file: any) => {
-    if (file.type == 'image/jpeg' || file.type == 'image/jpg' || file.type == 'image/png' || file.type == 'image/webg ' || file.type == 'image/gif') {
+    if (file.type == 'image/jpeg' || file.type == 'image/jpg' || file.type == 'image/png' || file.type == 'image/webp' || file.type == 'image/gif') {
         if (file.size / 1024 / 1024 < 4) {
 
             return true
@@ -167,12 +191,72 @@ const beforeAvatarUpload = (file: any) => {
     } else {
         ElMessage({
             showClose: true,
-            message: '上传文件的类型只能是jpg/jpeg/png/webg/gif',
+            message: '上传文件的类型只能是jpg/jpeg/png/webp/gif',
             center: true,
             type: 'warning'
         })
         return false
     }
+
+}
+// 点击删除销售属性
+const handleDelete = (id: number) => {
+    spuSaleList.value.splice(id, 1)
+}
+// 点击添加销售属性
+const handleAddAttr = () => {
+    spuSaleList.value.push({
+        spuId: spuData.value.id,
+        baseSaleAttrId: spuSaleAttrValue.value.split(':')[0],
+        saleAttrName: spuSaleAttrValue.value.split(':')[1],
+        spuSaleAttrValueList: [],
+    })
+    spuSaleAttrValue.value = ''
+
+}
+// 点击添加销售属性值
+const handleAddAttrValue = (row: SpuSaleAttr) => {
+    row.flag = true
+    nextTick(()=>{
+        inputRef.value.focus()
+    })
+    row.saleAttrValue = ''
+
+    
+}
+// 销售属性值输入框的blur事件
+const attrValueBlur = (row:SpuSaleAttr)=>{
+    if(row.saleAttrValue?.trim()==''){
+        ElMessage({
+            showClose: true,
+            message: '销售属性值不能为空',
+            center: true,
+            type: 'warning'
+        })
+        row.flag = false
+        return 
+        
+    }
+    let repeat = row.spuSaleAttrValueList.find((item:any)=>{
+            return (item.saleAttrValueName == row.saleAttrValue)
+        })
+    if (repeat) {
+        ElMessage({
+            showClose: true,
+            message: '已存在此销售属性值',
+            center: true,
+            type: 'warning'
+        })
+        row.flag = false
+        return 
+    }
+    row.spuSaleAttrValueList.push({
+        saleAttrValueName: row.saleAttrValue,
+        baseSaleAttrId: row.baseSaleAttrId as number,
+        saleAttrName: row.saleAttrName,
+        spuId: row.spuId,
+    })
+    row.flag = false
 
 }
 defineExpose({

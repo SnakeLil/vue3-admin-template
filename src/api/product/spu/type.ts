@@ -78,10 +78,11 @@ export interface SpuSaleAttr {
     createTime?: any,
     updateTime?: any,
     spuId?: number,
-    baseSaleAttrId: number,
+    baseSaleAttrId: number | string,
     saleAttrName: string,
     spuSaleAttrValueList: SpuSaleAttrValue[],
-
+    flag?: boolean,
+    saleAttrValue?: string,
 }
 export interface SpuSaleAttrResData {
     code: number;
