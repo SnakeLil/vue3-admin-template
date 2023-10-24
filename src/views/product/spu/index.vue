@@ -27,7 +27,7 @@
                         <template #="{ row }">
                             <div style="width: 100%;height: 100%;display: flex;">
                             </div>
-                            <el-button type="success" icon="Plus" size="mini" title="添加SKU" @click="handleAddSku"></el-button>
+                            <el-button type="success" icon="Plus" size="mini" title="添加SKU" @click="handleAddSku(row)"></el-button>
                             <el-button type="info" plain icon="Edit" size="mini" title="修改此SPU" @click="updateSpu(row)"></el-button>
                             <el-button icon="View" size="mini" title="查看所有sku"></el-button>
                             <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" :icon="InfoFilled"
@@ -48,7 +48,7 @@
             <!-- 添加/修改spu的组件 -->
             <spu-form v-show="compFlag === 1" @changeToList="changeToList()" ref="spu"></spu-form>
             <!-- 添加sku的组件 -->
-            <sku-form v-show="compFlag === 2"></sku-form>
+            <sku-form v-show="compFlag === 2" @changeToList="changeToList()" ref="sku"></sku-form>
         </el-card>
 
 
@@ -74,6 +74,7 @@ let total = ref<number>()
 let categoryStore = useCategoryStore()
 // 获取子组件vc实例
 let spu = ref<any>()
+let sku = ref<any>()
 watch(() => categoryStore.c3Id, () => {
     if (categoryStore.c3Id) {
         getSpuData()
@@ -87,7 +88,6 @@ const getSpuData = async () => {
     const loadingInstance = ElLoading.service({ target: '#spu', text: 'loading' })
     let res: SpuResData = await getSpuList(currentPage.value, pageLimit.value, categoryStore.c3Id)
     if (res.code === 200) {
-        console.log(res)
         spuList.value = res.data.records
         total.value = res.data.total
         loadingInstance.close()
@@ -104,6 +104,8 @@ const getSpuData = async () => {
 const handleAddSpu =()=>{
     compFlag.value = 1
     scene.value = false
+    // 点击添加，调用子组件实例的方法
+    spu.value.initAddSpu(categoryStore.c3Id)
 }
 // 点击修改已有的spu
 const updateSpu = (row:spuData)=>{
@@ -111,16 +113,21 @@ const updateSpu = (row:spuData)=>{
     scene.value = false
     // 获取到子组件的vc实例，调用子组件的getSpuData方法，将row传给子组件，子组件通过row获取到spu数据
     spu.value.getSpuData(row)
+    
 }
 // 点击添加sku
-const handleAddSku = ()=>{
+const handleAddSku = (row:spuData)=>{
     compFlag.value = 2
     scene.value = false
+    // 调用子组件的initSkuData方法，初始化sku数据
+    sku.value.initSkuData(categoryStore.c1Id,categoryStore.c2Id,row)
+    
 }
 // 子组件，点击取消，切换到列表组件
 const changeToList = ()=>{
     compFlag.value = 0
     scene.value = true
+   
 }
 </script>
 

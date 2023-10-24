@@ -1,5 +1,9 @@
 // spu 类型
-
+export interface res {
+    code:string,
+    message:string,
+    ok:boolean,
+}
 
 export interface SpuResData {
     code: number;
@@ -102,3 +106,33 @@ export interface SaleAttrValue {
     id?: number,
     name:string,
 }
+// 添加sku接口的数据类型
+export interface SkuData {
+    category3Id: number|string,
+    spuId: number|string,
+    tmId: number|string,
+    skuName: string,//sku名
+    price: number|string,
+    weight: number|string,
+    skuDesc: string,
+    skuAttrValueList?: SkuAttrValue[],//平台属性
+    skuSaleAttrValueList?:SkuSaleValue[],
+    skuDefaultImg:string,//图片地址
+
+}
+//平台属性的属性值
+export interface SkuAttrValue {
+    attrId: number|string,//平台属性id
+    valueId: number|string,//属性值id
+    // attrName: string,
+    // id:number,
+    // skuID: number,
+    // valueName: string,
+}
+// 销售属性
+export interface SkuSaleValue {
+    saleAttrId: number|string,//属性id
+    saleAttrValueId: number|string,//属性值id
+
+}
+

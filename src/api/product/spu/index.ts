@@ -1,6 +1,6 @@
 // spu相关接口
 import  request  from '@/utils/request';
-import type {spuData,SpuResData,TrademarkResData,SpuImageResData,SpuSaleAttrResData,AllSaleAttrResData} from './type'
+import type {spuData,SpuResData,TrademarkResData,SpuImageResData,SpuSaleAttrResData,AllSaleAttrResData,SkuData} from './type'
 enum API {
     SPU_LIST = '/admin/product/',
 
@@ -14,6 +14,7 @@ enum API {
     SPU_IMAGE_LIST = '/admin/product/spuImageList/',
     SPU_SALE_LIST = '/admin/product/spuSaleAttrList/',
     ALL_SALE_ATTR_LIST = '/admin/product/baseSaleAttrList',
+    ADD_SKU_FOR_SPU = '/admin/product/saveSkuInfo',
 }
 // 获取spu列表（根据页码，每页数）
 export const getSpuList = (page: number, limit: number,category3Id:number|string) => {
@@ -42,4 +43,8 @@ export const addOrUpdateSpu = (spuInfo: spuData) => {
     }else {
         return request.post<any,any>(API.SPU_ADD,spuInfo);
     }
+}
+// 为某个spu添加sku(参数：3级分类id，spuid，品牌id，sku)
+export const addSkuForSpu = (data:SkuData) => {
+    return request.post<any,any>(API.ADD_SKU_FOR_SPU,data); 
 }
