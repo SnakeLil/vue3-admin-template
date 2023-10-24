@@ -42,3 +42,6 @@ VITE_SERVE = 'https://xxx.com'
 
 </use>
 </svg>
+
+## bug :
+vue-admin\vue-admin-template\src\views\product\spu\skuForm.vue, 请求无法添加成功，估计是接口问题

@@ -173,7 +173,7 @@ const save = async () => {
     skuParams.skuImageList = []
     console.log(skuParams)
     try {
-        let res = await addSkuForSpu()
+        let res = await addSkuForSpu(skuParams)
         if(res.code === 200) {
             ElMessage({
                 type: 'success',
