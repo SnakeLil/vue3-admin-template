@@ -6,7 +6,7 @@ enum API {
 
     SPU_ADD = '/admin/product/saveSpuInfo', 
     SPU_UPDATE = '/admin/product/updateSpuInfo',
-    SPU_DELETE = '/admin/product/deleteSpu/{spuId}',
+    SPU_DELETE = '/admin/product/deleteSpu/',
 
     SPU_INFO = '/admin/product/getSpuById/{spuId}',
 
@@ -15,6 +15,7 @@ enum API {
     SPU_SALE_LIST = '/admin/product/spuSaleAttrList/',
     ALL_SALE_ATTR_LIST = '/admin/product/baseSaleAttrList',
     ADD_SKU_FOR_SPU = '/admin/product/saveSkuInfo',
+    SKU_INFO_BY_SPU = '/admin/product/findBySpuId/',
 }
 // 获取spu列表（根据页码，每页数）
 export const getSpuList = (page: number, limit: number,category3Id:number|string) => {
@@ -47,4 +48,12 @@ export const addOrUpdateSpu = (spuInfo: spuData) => {
 // 为某个spu添加sku(参数：3级分类id，spuid，品牌id，sku)
 export const addSkuForSpu = (data:SkuData) => {
     return request.post<any,any>(API.ADD_SKU_FOR_SPU,data); 
+}
+// 查看某个spu下的所有sku
+export const getSkuListBySpu = (spuId: number) => {
+    return request.get<any,any>(API.SKU_INFO_BY_SPU+spuId);
+}
+// 删除spu
+export const deleteSpu = (spuId: number) => {
+    return request.delete<any,any>(API.SPU_DELETE+spuId);
 }

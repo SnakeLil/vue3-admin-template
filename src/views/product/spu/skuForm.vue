@@ -70,7 +70,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { getAttrInfoList } from '@/api/product/attr/index'
-import { getSpuImageList, getSpuSaleList, addSkuForSpu } from '@/api/product/spu/index'
+import { getSpuImageList, getSpuSaleList, addSkuForSpu, } from '@/api/product/spu/index'
 import { SpuSaleAttrResData, SpuImageResData, SkuData, SkuAttrValue, SkuSaleValue } from '@/api/product/spu/type'
 import { AttrResData } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus'

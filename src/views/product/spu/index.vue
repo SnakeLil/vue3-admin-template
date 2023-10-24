@@ -29,9 +29,9 @@
                             </div>
                             <el-button type="success" icon="Plus" size="mini" title="添加SKU" @click="handleAddSku(row)"></el-button>
                             <el-button type="info" plain icon="Edit" size="mini" title="修改此SPU" @click="updateSpu(row)"></el-button>
-                            <el-button icon="View" size="mini" title="查看所有sku"></el-button>
+                            <el-button icon="View" size="mini" title="查看所有sku" @click="seeSku(row)"></el-button>
                             <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" :icon="InfoFilled"
-                                icon-color="#626AEF" :title="`确定删除吗?`" @confirm="">
+                                icon-color="#626AEF" :title="`确定删除吗?`" @confirm="confirmDelete(row)">
                                 <template #reference>
                                     <el-button type="info" icon="delete"></el-button>
                                 </template>
@@ -49,6 +49,26 @@
             <spu-form v-show="compFlag === 1" @changeToList="changeToList()" ref="spu"></spu-form>
             <!-- 添加sku的组件 -->
             <sku-form v-show="compFlag === 2" @changeToList="changeToList()" ref="sku"></sku-form>
+            <!-- 对话框，点击查看sku列表时显示 -->
+            <el-dialog title="sku列表" v-model="skuDialogVisible" width="50%">
+                <el-card>
+                    <el-table :data="skuList" border style="width: 100%">
+                        <el-table-column type="index" label="序号" width="50" align="center"></el-table-column>
+                        <el-table-column prop="skuName" label="名称" align="center"></el-table-column>
+                        <el-table-column prop="skuDesc" label="描述" align="center"></el-table-column>
+                        <el-table-column prop="price" label="价格" align="center"></el-table-column>
+                        <el-table-column prop="weight" label="重量" align="center"></el-table-column>
+                        <el-table-column label="默认图片" >
+                            <template v-slot="{row}">
+                                <div style="width:100%;height:100%;display:flex;justify-content:center">
+                                
+                                    <img :src="row.skuDefaultImg" alt="" style="width:100px;height:100px">
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-card>
+            </el-dialog>
         </el-card>
 
 
@@ -59,7 +79,7 @@
 import { ref, watch } from 'vue'
 // 分类仓库
 import useCategoryStore from '@/store/modules/category'
-import { getSpuList } from '@/api/product/spu/index'
+import { getSpuList,getSkuListBySpu,deleteSpu } from '@/api/product/spu/index'
 import type { SpuResData, spuData } from '@/api/product/spu/type'
 import { ElLoading, ElMessage } from 'element-plus'
 import { InfoFilled } from '@element-plus/icons-vue'
@@ -75,6 +95,10 @@ let categoryStore = useCategoryStore()
 // 获取子组件vc实例
 let spu = ref<any>()
 let sku = ref<any>()
+// 存储全部sku
+let skuList = ref<any[]>()
+// 控制对话框显示
+let skuDialogVisible = ref<boolean>(false)
 watch(() => categoryStore.c3Id, () => {
     if (categoryStore.c3Id) {
         getSpuData()
@@ -128,6 +152,54 @@ const changeToList = ()=>{
     compFlag.value = 0
     scene.value = true
    
+}
+const seeSku = async(row:spuData) =>{
+    skuDialogVisible.value = true
+    try {
+        let res = await getSkuListBySpu(row.id)
+        if(res.code === 200) {
+            skuList.value = res.data
+            console.log(res)
+        }
+    }catch(err) {
+        ElMessage({
+            showClose: true,
+            message: '请求失败',
+            center: true,
+            type: 'error'
+        })
+    }
+    
+}
+// 点击确认删除
+const confirmDelete = async(row)=>{
+    try {
+        let res = await deleteSpu(row.id)
+        if(res.code === 200) {
+            ElMessage({
+                showClose: true,
+                message: '删除成功',
+                center: true,
+                type: 'success'
+            })
+            getSpuData()
+        }else {
+            ElMessage({
+                showClose: true,
+                message: '超时啦',
+                center: true,
+                type: 'warning'
+            })
+        }
+    }catch(err) {
+
+        ElMessage({
+            showClose: true,
+            message: '请求失败'+err.message,
+            center: true,
+            type: 'error'
+        })
+    }
 }
 </script>
 
