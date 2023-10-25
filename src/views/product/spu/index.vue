@@ -156,7 +156,7 @@ const changeToList = ()=>{
 const seeSku = async(row:spuData) =>{
     skuDialogVisible.value = true
     try {
-        let res = await getSkuListBySpu(row.id)
+        let res = await getSkuListBySpu(row.id as number)
         if(res.code === 200) {
             skuList.value = res.data
             console.log(res)
@@ -172,7 +172,7 @@ const seeSku = async(row:spuData) =>{
     
 }
 // 点击确认删除
-const confirmDelete = async(row)=>{
+const confirmDelete = async(row:any)=>{
     try {
         let res = await deleteSpu(row.id)
         if(res.code === 200) {
@@ -191,7 +191,7 @@ const confirmDelete = async(row)=>{
                 type: 'warning'
             })
         }
-    }catch(err) {
+    }catch(err:any) {
 
         ElMessage({
             showClose: true,

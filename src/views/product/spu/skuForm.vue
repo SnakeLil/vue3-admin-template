@@ -71,7 +71,7 @@
 import { ref, reactive } from 'vue'
 import { getAttrInfoList } from '@/api/product/attr/index'
 import { getSpuImageList, getSpuSaleList, addSkuForSpu, } from '@/api/product/spu/index'
-import { SpuSaleAttrResData, SpuImageResData, SkuData, SkuAttrValue, SkuSaleValue } from '@/api/product/spu/type'
+import { SpuSaleAttrResData, SpuImageResData, SkuData } from '@/api/product/spu/type'
 import { AttrResData } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus'
 let $emit = defineEmits(['changeToList'])
@@ -111,6 +111,27 @@ const cancel = () => {
     $emit('changeToList')
 }
 const initSkuData = async (c1Id: number | string, c2Id: number | string, spu: any) => {
+    Object.assign(skuParams, {
+        //定义存储sku名称
+        category3Id: '',
+        spuId: '',
+        tmId: '',
+        skuName: '',//sku名
+        price: 0,
+        weight: 0,
+        skuDesc: '',
+        skuAttrValueList: [
+            //     {attrId: '',//平台属性id
+            //     valueId: '',//属性值id
+            // }
+        ],//平台属性SkuAttrValue
+        skuSaleAttrValueList: [
+            //     {saleAttrId:'',//属性id
+            // saleAttrValueId: '',//属性值id
+            // }
+        ],//SkuSaleValue
+        skuDefaultImg: '',//图片地址
+    })
     skuParams.category3Id = spu.category3Id
     skuParams.spuId = spu.id
     skuParams.tmId = spu.tmId
@@ -124,7 +145,7 @@ const initSkuData = async (c1Id: number | string, c2Id: number | string, spu: an
         // 获取关联的spu的销售属性列表
         let saleAttrRes: SpuSaleAttrResData = await getSpuSaleList(spu.id)
         saleAttrList.value = saleAttrRes.data
-    } catch (err) {
+    } catch (err: any) {
         ElMessage({
             message: err.message,
             type: 'error',
@@ -149,32 +170,30 @@ const save = async () => {
                 attrId: item.attrIdAndName.split(':')[0],
                 valueId: item.attrIdAndName.split(':')[1],
             }
-        }else {
+        } else {
             return
         }
-    }).filter(item=>{
+    }).filter(item => {
         return item
     })
     let saleArr = saleAttrList.value.map(item => {
-        if(item.attrIdAndName?.length > 0) {
+        if (item.attrIdAndName?.length > 0) {
             return {
-            saleAttrId: item.attrIdAndName.split(':')[0],
-            saleAttrValueId: item.attrIdAndName.split(':')[1],
-        }
-        }else {
+                saleAttrId: item.attrIdAndName.split(':')[0],
+                saleAttrValueId: item.attrIdAndName.split(':')[1],
+            }
+        } else {
             return
         }
 
-    }).filter(item=>{
+    }).filter(item => {
         return item
     })
     skuParams.skuAttrValueList = attrArr
     skuParams.skuSaleAttrValueList = saleArr
-    skuParams.skuImageList = []
-    console.log(skuParams)
     try {
         let res = await addSkuForSpu(skuParams)
-        if(res.code === 200) {
+        if (res.code === 200) {
             ElMessage({
                 type: 'success',
                 center: true,
@@ -184,7 +203,7 @@ const save = async () => {
             // 添加成功，切换回列表页
             //（这里可能接口有问题，返回201，一直是失败）
             $emit('changeToList')
-        }else {
+        } else {
             console.log(res)
             ElMessage({
                 type: 'warning',
@@ -193,7 +212,7 @@ const save = async () => {
                 message: res.message
             })
         }
-    }catch(err) {
+    } catch (err: any) {
         ElMessage({
             type: 'error',
             center: true,
@@ -201,7 +220,7 @@ const save = async () => {
             message: err.message
         })
     }
-    
+
 }
 defineExpose({
     initSkuData

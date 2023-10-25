@@ -108,6 +108,7 @@ export interface SaleAttrValue {
 }
 // 添加sku接口的数据类型
 export interface SkuData {
+    id?:number |string,
     category3Id: number|string,
     spuId: number|string,
     tmId: number|string,
@@ -118,7 +119,7 @@ export interface SkuData {
     skuAttrValueList?: SkuAttrValue[],//平台属性
     skuSaleAttrValueList?:SkuSaleValue[],
     skuDefaultImg:string,//图片地址
-
+    isSale?:number |string
 }
 //平台属性的属性值
 export interface SkuAttrValue {
