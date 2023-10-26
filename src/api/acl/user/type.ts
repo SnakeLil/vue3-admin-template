@@ -31,3 +31,23 @@ export interface userResData extends res {
         searchCount?:boolean,
     }
 }
+
+// 一个账号信息
+export interface user {
+    id?:number|string,
+    name?:string,
+    password:string,
+    phone?:string,
+    roleName?:string,
+    username:string,
+    createTime?:string,
+    updateTime?:string,
+}
+export interface AOrUResData extends res {
+    data:user
+}
+// 给用户分配角色 的ts类型
+export interface userRole {
+    roleIdList:any[],
+    userId:string|number,
+}

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="user">
         <el-card style="padding: 20px 0 0;">
             <el-form inline>
                 <el-form-item label="用户名:">
@@ -20,13 +20,13 @@
                 <el-table-column prop="id" label="id" width="150" align="center" />
                 <el-table-column prop="name" label="名字" width="180" align="center" />
                 <el-table-column prop="username" label="用户名" width="180" align="center" />
-                <el-table-column prop="roleName" label="用户角色" width="180" align="center" />
+                <el-table-column prop="roleName" show-overflow-tooltip label="用户角色" width="180" align="center" />
                 <el-table-column prop="createTime" show-overflow-tooltip label="创建时间" align="center" />
                 <el-table-column prop="updateTime" show-overflow-tooltip label="更新时间" align="center" />
                 <el-table-column label="操作" width="350" align="center">
                     <template #="{ row }">
                         <div style="width: 100%;height: 100%; display: flex;justify-content: center;">
-                            <el-button icon="user">分配角色</el-button>
+                            <el-button icon="user" @click="asRoles(row)">分配角色</el-button>
                             <el-button type="info" plain icon="Edit" @click="editUser(row)">编辑</el-button>
                             <el-button type="info" icon="Delete">删除</el-button>
                         </div>
@@ -39,51 +39,125 @@
                 @current-change="getAllUserList" />
         </el-card>
         <!-- 对话框组件，修改/添加用户 -->
-        <el-dialog v-model="dialogTableVisible" title="添加用户" width="700px">
-            <el-form label-position="top">
-                <el-form-item label="姓名" prop="email">
-                    <el-input placeholder="请输入姓名" style="width: 300px;" />
+        <el-dialog v-model="dialogTableVisible" width="700px">
+            <template #header>
+                <h1>{{ userParams.id ? "修改信息" : "添加用户" }}</h1>
+            </template>
+            <el-form label-position="top" :model="userParams" :rules="rules" ref="formRef">
+                <el-form-item label="姓名" prop="name">
+                    <el-input v-model="userParams.name" placeholder="请输入姓名" style="width: 300px;" />
                 </el-form-item>
                 <el-form-item label="用户名" prop="username">
-                    <el-input placeholder="请输入用户名" style="width: 300px;" />
+                    <el-input v-model="userParams.username" placeholder="请输入用户名" style="width: 300px;" />
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input placeholder="请输入密码" style="width: 300px;" />
+                <el-form-item label="密码" prop="password" v-if="!userParams.id">
+                    <el-input v-model="userParams.password" placeholder="请输入密码" style="width: 300px;" />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <span>
                     <el-button type="info" plain @click="cacel">取消</el-button>
-                    <el-button type="info" >
+                    <el-button
+                        :disabled="!(userParams.name?.trim().length && userParams.username.trim().length && userParams.password.trim().length)"
+                        type="info" @click="handleConfirm">
                         确定
                     </el-button>
                 </span>
             </template>
         </el-dialog>
+        <!-- 抽屉组件，分配角色 -->
+        <el-drawer ref="drawerRef" v-model="drawerVisible" class="demo-drawer">
+            <template #header>
+                <h1 style="font-weight: bold;">分配角色</h1>
+            </template>
+            <el-form label-position="top">
+                <el-form-item label="用户名">
+                    <el-input disabled v-model="userParams.username" />
+                </el-form-item>
+                <el-form-item label="角色列表">
+                    <el-checkbox v-model="checkAll" @change="handleCheckAllChange" style="margin: 0 20px;">全选</el-checkbox>
+                    <br>
+                    <el-checkbox-group v-model="checkedRoles" @change="handleCheckedRolesChange">
+                        <el-checkbox v-for="item in roles" :key="item.id" :label="item">
+                            {{ item.roleName }}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+
+            </el-form>
+            <template #footer>
+                <div style="flex: auto">
+                    <el-button type="info" plain @click="comfirmRoles">确定</el-button>
+                    <el-button type="info" @click="drawerVisible = false">取消</el-button>
+                </div>
+            </template>
+        </el-drawer>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getAllUser } from '@/api/acl/user/index'
-import { userResData, userInfo } from '@/api/acl/user/type'
-import { ElMessage } from 'element-plus';
+import { ref, onMounted, nextTick } from 'vue'
+import { getAllUser, addOrUpdateUser, getAllRoles, assignRoles } from '@/api/acl/user/index'
+import { userResData, userInfo, user,userRole } from '@/api/acl/user/type'
+import { ElMessage, ElLoading } from 'element-plus';
 let currentPage = ref<number>(1)
 let pageLimit = ref<number>(5)
 let total = ref<number>(10)
 let userList = ref<userInfo[]>([])
-
+// 收集用户信息
+let userParams = ref<user>({
+    id: '',
+    username: '',
+    password: '',
+    name: '',
+})
+// 表单实例
+let formRef = ref<any>()
 // 对话框显示
 let dialogTableVisible = ref<boolean>(false)
+// 抽屉显示
+let drawerVisible = ref<boolean>(false)
+// 多选框
+let checkAll = ref<boolean>(false)
+// 角色数组
+let checkedRoles = ref<any>([])//已勾选的角色
+
+let roles = ref<any>([])//所有角色
 onMounted(() => {
     getAllUserList()
+})
+// 密码的校验规则
+const validatePass = (rule: any, value: any, callback: any) => {
+    if (value === '') {
+        callback(new Error('密码不能为空'))
+    } else {
+        if (value.trim().length < 6) {
+            callback(new Error('密码长度至少大于5位'))
+        }
+        callback()
+    }
+}
+// 校验规则
+let rules = ref<any>({
+    name: [
+        { required: true, message: '名字不能为空', trigger: 'blur' },
+        { min: 5, max: 8, message: '名字长度应在5-8位', trigger: 'blur' },
+    ],
+    username: [
+        { required: true, message: '用户名不能为空', trigger: 'blur' },
+        { min: 2, max: 15, message: '用户名长度应在2-15位', trigger: 'blur' },
+    ],
+    password: [
+
+        { validator: validatePass, trigger: 'blur' }
+    ],
+
 })
 
 //获取全部用户 
 const getAllUserList = async () => {
     try {
         let res: userResData = await getAllUser(currentPage.value, pageLimit.value)
-        console.log(res)
         if (res.code == 200) {
             currentPage.value = res.data.current
             pageLimit.value = res.data.size
@@ -104,14 +178,122 @@ const getAllUserList = async () => {
 // 点击添加用户
 const addUser = () => {
     dialogTableVisible.value = true
+    Object.assign(userParams.value, { id: '', username: '', password: '', name: '' })
+    nextTick(() => {
+        formRef.value.clearValidate('username')
+        formRef.value.clearValidate('name')
+        formRef.value.clearValidate('password')
+    })
 }
 // 点击编辑用户
 const editUser = (row: userInfo) => {
     dialogTableVisible.value = true
+    Object.assign(userParams.value, row)
+    nextTick(() => {
+        formRef.value.clearValidate('username')
+        formRef.value.clearValidate('name')
+    })
+
+}
+// 点击分配角色
+const asRoles = async (row: userInfo) => {
+    drawerVisible.value = true
+    Object.assign(userParams.value, row)
+    console.log(userParams.value.roleName)
+
+    let res = await getAllRoles(row.id as number)
+    if (res.code == 200) {
+        roles.value = res.data.allRolesList
+        checkedRoles.value = res.data.assignRoles
+        console.log(res)
+    } else {
+        ElMessage({
+            message: res.message,
+            type: 'error',
+            center: true,
+            showClose: true
+        })
+    }
 }
 // 点击取消按钮退出对话框
-const cacel =()=>{
+const cacel = () => {
     dialogTableVisible.value = false
+}
+// 点击确认按钮，新增/修改用户信息
+const handleConfirm = async () => {
+    await formRef.value.validate()
+    const loadingInstance = ElLoading.service({ target: '#user', text: 'loading' })
+    try {
+        let res: any = await addOrUpdateUser(userParams.value)
+        if (res.code == 200) {
+            ElMessage({
+                message: userParams.value.id ? '修改成功' : '添加成功',
+                type: 'success',
+                center: true,
+                showClose: true
+            })
+            getAllUserList()
+            loadingInstance.close()
+            dialogTableVisible.value = false
+            window.location.reload()
+        } else {
+            loadingInstance.close()
+            ElMessage({
+                message: res.message,
+                type: 'warning',
+                center: true,
+                showClose: true
+            })
+            dialogTableVisible.value = false
+        }
+    } catch (err: any) {
+        loadingInstance.close()
+        ElMessage({
+            message: err.message,
+            type: 'error',
+            center: true,
+            showClose: true
+        })
+        dialogTableVisible.value = false
+    }
+}
+// 多选
+const handleCheckedRolesChange = (val: any) => {
+    console.log(val)
+    if (val.length === roles.value.length) {
+        checkAll.value = true
+    } else {
+        checkAll.value = false
+    }
+}
+// 角色全选
+const handleCheckAllChange = (val: any) => {
+    checkedRoles.value = val ? roles.value : []
+}
+// 点击角色分配的确定按钮
+const comfirmRoles = async () => {
+    let userRolesData:userRole = {
+        roleIdList:checkedRoles.value.map((item:any)=>item.id),
+        userId: userParams.value.id as number,
+    }
+    let res = await assignRoles(userRolesData)
+    if(res.code == 200){
+        ElMessage({
+            message: '分配成功',
+            type: 'success',
+            center: true,
+            showClose: true
+        })
+        drawerVisible.value = false
+        getAllUserList()
+    }else {
+        ElMessage({
+            message: res.message,
+            type: 'error',
+            center: true,
+            showClose: true
+        })
+    }
 }
 </script>
 
