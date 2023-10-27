@@ -3,11 +3,11 @@
         <el-card style="padding: 20px 0 0;">
             <el-form inline>
                 <el-form-item label="角色名:">
-                    <el-input placeholder="请输入角色名" style="width: 200px;"/>
+                    <el-input placeholder="请输入角色名" v-model="roleName" style="width: 200px;"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button  type="info" v-model="roleName" plain icon="Search" @click="searchRoles">查询</el-button>
-                    <el-button type="info" icon="Switch">重置</el-button>
+                    <el-button  type="info"  plain icon="Search" @click="searchRoles">查询</el-button>
+                    <el-button type="info" icon="Switch" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
@@ -50,6 +50,8 @@ import { InfoFilled } from '@element-plus/icons-vue'
 import {getRoleList} from '@/api/acl/role/index'
 import {roleListResData,roleType} from '@/api/acl/role/type'
 import { ElMessage } from 'element-plus';
+import useSettingStore from '@/store/modules/setting'
+let settingStore = useSettingStore()
 let currentPage = ref<number>(1)
 let pageLimit = ref<number>(5)
 let total = ref<number>(0)
@@ -83,6 +85,10 @@ const getAllRolesList =async ()=>{
 const searchRoles = ()=>{
     getAllRolesList()
     roleName.value = ''
+}
+// 点击重置按钮
+const reset = ()=>{
+    settingStore.refresh = !settingStore.refresh
 }
 </script>
 
