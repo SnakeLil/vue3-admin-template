@@ -162,7 +162,7 @@ let rules = ref<any>({
     ],
     username: [
         { required: true, message: '用户名不能为空', trigger: 'blur' },
-        { min: 2, max: 15, message: '用户名长度应在2-15位', trigger: 'blur' },
+        { min: 9, max: 15, message: '用户名长度应在9-15位', trigger: 'blur' },
     ],
     password: [
 

@@ -5,7 +5,7 @@ export interface res {
 }
 
 export interface roleType {
-        id?: number,
+        id?: number|string,
         createTime?:string,
         updateTime?: string,
         roleName?: string,
@@ -25,4 +25,23 @@ export interface roleListResData extends res{
         searchCount?: boolean,
         pages?: number
     },
+}
+
+// 菜单数据
+export interface menuData {
+    id: number |string,
+      createTime: string,
+      updateTime: string,
+      pid: number,
+      name: string,
+      code: any,
+      toCode: any,
+      type: number,
+      status: any,
+      level: number,
+      children:any[]
+}
+// 菜单返回
+export interface menuType extends res {
+    data:menuData[]
 }

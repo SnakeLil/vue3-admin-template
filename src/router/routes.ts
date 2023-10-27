@@ -62,7 +62,8 @@ export  const constantRoutes = [
 // 数据大屏路由
     {
         path:'/screen',
-        component:()=>import('@/views/screen/index.vue'),
+        // component:()=>import('@/views/screen/index.vue'),
+        component:()=>import('@/views/home/home.vue'),
         name:'screen',
         meta:{
             title:'数据可视化',
@@ -99,8 +100,8 @@ export  const constantRoutes = [
                 },
             },
             {
-                path:'/acl/permission',
-                component:()=>import('@/views/acl/permission/index.vue'),
+                path:'/acl/menu',
+                component:()=>import('@/views/acl/menu/index.vue'),
                 name:'permission',
                 meta:{
                     title:'菜单管理',
