@@ -3,18 +3,23 @@
         <el-card style="padding: 20px 0 0;">
             <el-form inline>
                 <el-form-item label="用户名:">
-                    <el-input placeholder="请输入用户名" style="width: 200px;" />
+                    <el-input placeholder="请输入用户名" style="width: 200px;" v-model="keyword"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="info" plain icon="Search">查询</el-button>
-                    <el-button type="info" icon="Switch">重置</el-button>
+                    <el-button @click="searchUser" type="info" plain icon="Search" :disabled="keyword.trim().length?false:true">查询</el-button>
+                    <el-button type="info" icon="Switch" @click="reset">重置</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
         <el-card style="margin-top: 20px;">
             <el-button type="info" plain icon="Plus" @click="addUser">新增用户</el-button>
-            <el-button type="info" icon="Delete">删除</el-button>
-            <el-table border :data="userList" style="margin-top: 20px;" stripe>
+            <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" :icon="InfoFilled"
+                                icon-color="#626AEF" :title="`确定删除吗?`" @confirm="handleDeleteAll">
+                                <template #reference>
+                                    <el-button type="info" icon="delete" :disabled="deleteIdList.length?false:true">删除用户</el-button>
+                                </template>
+                            </el-popconfirm>
+            <el-table border :data="userList" style="margin-top: 20px;" stripe @select="select">
                 <el-table-column type="selection" width="70" align="center" />
                 <el-table-column label="序号" type="index" width="100" align="center"></el-table-column>
                 <el-table-column prop="id" label="id" width="150" align="center" />
@@ -28,7 +33,12 @@
                         <div style="width: 100%;height: 100%; display: flex;justify-content: center;">
                             <el-button icon="user" @click="asRoles(row)">分配角色</el-button>
                             <el-button type="info" plain icon="Edit" @click="editUser(row)">编辑</el-button>
-                            <el-button type="info" icon="Delete">删除</el-button>
+                            <el-popconfirm width="220" confirm-button-text="确认" cancel-button-text="取消" :icon="InfoFilled"
+                                icon-color="#626AEF" :title="`确定删除吗?`" @confirm="handleDelete(row)">
+                                <template #reference>
+                                    <el-button type="info" icon="delete">删除</el-button>
+                                </template>
+                            </el-popconfirm>
                         </div>
                     </template>
                 </el-table-column>
@@ -97,9 +107,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { getAllUser, addOrUpdateUser, getAllRoles, assignRoles } from '@/api/acl/user/index'
-import { userResData, userInfo, user,userRole } from '@/api/acl/user/type'
+import { getAllUser, addOrUpdateUser, getAllRoles, assignRoles, deleteUser ,deleteBatchUser} from '@/api/acl/user/index'
+import { userResData, userInfo, user, userRole } from '@/api/acl/user/type'
 import { ElMessage, ElLoading } from 'element-plus';
+import { InfoFilled } from '@element-plus/icons-vue'
+import useSettingStore from '@/store/modules/setting'
+let settingStore = useSettingStore()
 let currentPage = ref<number>(1)
 let pageLimit = ref<number>(5)
 let total = ref<number>(10)
@@ -123,6 +136,10 @@ let checkAll = ref<boolean>(false)
 let checkedRoles = ref<any>([])//已勾选的角色
 
 let roles = ref<any>([])//所有角色
+// 收集批量删除的用户id
+let deleteIdList = ref<any[]>([])
+// 搜索用户
+let keyword = ref<string>('')
 onMounted(() => {
     getAllUserList()
 })
@@ -157,7 +174,7 @@ let rules = ref<any>({
 //获取全部用户 
 const getAllUserList = async () => {
     try {
-        let res: userResData = await getAllUser(currentPage.value, pageLimit.value)
+        let res: userResData = await getAllUser(currentPage.value, pageLimit.value,keyword.value)
         if (res.code == 200) {
             currentPage.value = res.data.current
             pageLimit.value = res.data.size
@@ -199,13 +216,11 @@ const editUser = (row: userInfo) => {
 const asRoles = async (row: userInfo) => {
     drawerVisible.value = true
     Object.assign(userParams.value, row)
-    console.log(userParams.value.roleName)
 
     let res = await getAllRoles(row.id as number)
     if (res.code == 200) {
         roles.value = res.data.allRolesList
         checkedRoles.value = res.data.assignRoles
-        console.log(res)
     } else {
         ElMessage({
             message: res.message,
@@ -272,12 +287,12 @@ const handleCheckAllChange = (val: any) => {
 }
 // 点击角色分配的确定按钮
 const comfirmRoles = async () => {
-    let userRolesData:userRole = {
-        roleIdList:checkedRoles.value.map((item:any)=>item.id),
+    let userRolesData: userRole = {
+        roleIdList: checkedRoles.value.map((item: any) => item.id),
         userId: userParams.value.id as number,
     }
     let res = await assignRoles(userRolesData)
-    if(res.code == 200){
+    if (res.code == 200) {
         ElMessage({
             message: '分配成功',
             type: 'success',
@@ -286,7 +301,7 @@ const comfirmRoles = async () => {
         })
         drawerVisible.value = false
         getAllUserList()
-    }else {
+    } else {
         ElMessage({
             message: res.message,
             type: 'error',
@@ -294,6 +309,88 @@ const comfirmRoles = async () => {
             showClose: true
         })
     }
+}
+// 点击确认删除
+const handleDelete = async (row: any) => {
+
+    try {
+        let res = await deleteUser(row.id)
+        if (res.code == 200) {
+            console.log(res)
+            ElMessage({
+                message: '删除成功',
+                type: 'success',
+                center: true,
+                showClose: true
+            })
+            getAllUserList()
+        } else {
+            ElMessage({
+                message: res.message,
+                type: 'warning',
+                center: true,
+                showClose: true
+            })
+        }
+    } catch (error: any) {
+        ElMessage({
+            message: error.message,
+            type: 'error',
+            center: true,
+            showClose: true
+        })
+    }
+}
+// 表格select事件
+const select = (selection:any)=>{
+
+    deleteIdList.value = selection
+    nextTick(()=>{
+        console.log(deleteIdList.value)
+    })
+}
+// 确定批量删除
+const handleDeleteAll = async ()=>{
+    let ids = deleteIdList.value.map(item=>item.id)
+
+    try {
+        let res = await deleteBatchUser(ids)
+        if (res.code == 200) {
+            console.log(res)
+            ElMessage({
+                message: '删除成功',
+                type: 'success',
+                center: true,
+                showClose: true
+            })
+            getAllUserList()
+        } else {
+            console.log(res)
+            ElMessage({
+                message: res.message,
+                type: 'warning',
+                center: true,
+                showClose: true
+            })
+        }
+    } catch (error: any) {
+        ElMessage({
+            message: error.message,
+            type: 'error',
+            center: true,
+            showClose: true
+        })
+    }
+}
+// 点击搜索用户
+const searchUser = ()=>{
+    getAllUserList()
+    // 清空关键字
+    keyword.value = ''
+}
+// 点击重置按钮
+const reset = ()=>{
+    settingStore.refresh = !settingStore.refresh
 }
 </script>
 

@@ -9,7 +9,7 @@
                 <router-link to='/register'><button>Register</button></router-link>
             </div>
             <div className="right">
-                <h2>Login</h2>
+                <h2>登录</h2>
                 <form>
                     <input type="text" name='username' 
                     v-model="user.username" 
@@ -17,7 +17,7 @@
                     
                     />
                     <input type="password" name='password' v-model="user.password"  placeholder='Password' />
-                    <button @click.prevent="handleLogin">login</button>
+                    <button @click.prevent="handleLogin">登录</button>
 
                 </form>
 
@@ -66,7 +66,7 @@ const handleLogin = async ()=>{
 <style scoped lang="scss">
 @import '@/styles/index.scss';
 .login {
-    background-color: rgb(23, 23, 23);
+    // background-color: rgb(23, 23, 23);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,6 +81,7 @@ const handleLogin = async ()=>{
         background-color: white;
         display: flex;
         overflow: hidden;
+        box-shadow: 0px 4px 8px 1px rgb(0 0 0 / 10%);
         .left {
             background-color:gray;
             background-size: cover;
@@ -164,9 +165,12 @@ const handleLogin = async ()=>{
                     font-weight: bold;
                     padding: 10px 50px;
                     width: fit-content;
-                    background-color: black;
+                    background-color: rgb(0, 0, 0);
                     color: rgb(255, 255, 255);
                     cursor: pointer;
+                }
+                button:hover {
+                    background-color: rgb(94, 94, 94);
                 }
             }
         }
