@@ -5,6 +5,7 @@ export interface UserState {
     avatar:string | null,
     username:string | null,
     roles:string[] |any,
+    buttons:any[]
 }
 // 定义category 仓库state的类型
 export interface CategoryState {

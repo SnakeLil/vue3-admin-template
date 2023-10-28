@@ -12,6 +12,7 @@ import '@/styles/index.scss'
 import router from './router'
 import pinia from './store'
 import './permission'
+import{isHasButton} from  '@/directive/hasButton'
 const app = createApp(App)
 
 app.use(ElementPlus,{
@@ -24,3 +25,5 @@ app.use(router)
 app.use(pinia)
 
 app.mount('#app')
+
+isHasButton(app)

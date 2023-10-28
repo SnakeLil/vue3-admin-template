@@ -9,7 +9,22 @@ import {
     setUsername, setUserAvatar, setUserRoles,
     getUsername, getUserAvatar, getUserRoles
 } from '@/utils/token'
-import { constantRoutes } from '@/router/routes'
+import { constantRoutes ,asyncRoutes,anyRoutes} from '@/router/routes'
+import router from '@/router'
+// @ts-ignore
+import cloneDeep from 'lodash/cloneDeep'
+function asyncFilter (asyncArr:any[],currentArr:any[]){
+    return asyncArr.filter((item:any)=>{
+         if(currentArr.includes(item.name)) {
+            if(item.children&&item.children.length>0) {
+                 item.children = asyncFilter(item.children,currentArr)
+            }
+            return true
+        }
+        
+    })
+}
+
 let useUserStore = defineStore('user', {
     state: (): UserState => {
         return {
@@ -18,12 +33,14 @@ let useUserStore = defineStore('user', {
             username: '',
             roles: [],
             menuRoutes: constantRoutes,
+            buttons:[]
         }
     },
 
     actions: {
         async userLogin(user: loginForm) {
             let res: loginResData = await login(user)
+            
             if (res.code === 200) {
                 this.token = (res.data as string)
                 //    本地存储
@@ -34,11 +51,21 @@ let useUserStore = defineStore('user', {
         },
         // 获取用户信息
         async UserInfo() {
+
             let res:userInfoResData= await getUserInfo()
+            
+            
             if (res.code === 200) {
+                let userAsyncRoutes = asyncFilter(cloneDeep(asyncRoutes),res.data.routes)
+                this.menuRoutes = [...constantRoutes,...userAsyncRoutes,...anyRoutes];
+                [...userAsyncRoutes,...anyRoutes].forEach((item:any)=>{
+                    router.addRoute(item)
+                })
+                
                 this.username = res.data.name
                 this.avatar = res.data.avatar
                 this.roles = res.data.roles
+                this.buttons = res.data.buttons
                 // 本地存储
 
                 // setUsername(res.data.checkUser.username)

@@ -41,24 +41,7 @@ export  const constantRoutes = [
             hidden:true,
         },
     },
-    {
-        path:'/404',
-        component:()=>import('@/views/404/index.vue'),
-        name:'404',
-        meta:{
-            title:'404',
-            hidden:true,
-        },
-    },
-    {
-        path:'/:pathMatch(.*)*',
-        redirect:'/404',
-        name:'any',
-        meta:{
-            title:'无效地址',
-            hidden:true,
-        },
-    },
+
 // 数据大屏路由
     {
         path:'/screen',
@@ -70,97 +53,7 @@ export  const constantRoutes = [
             icon:'Monitor'
         },
     },
-    // 权限管理路由
-    {
-        path:'/acl',
-        component:()=>import('@/views/home/index.vue'),
-        name:'acl',
-        meta:{
-            title:'权限管理',
-            icon:'Operation'
-        },
-        redirect:'/acl/user',
-        children:[
-            {
-                path:'/acl/user',
-                component:()=>import('@/views/acl/user/index.vue'),
-                name:'user',
-                meta:{
-                    title:'用户管理',
-                    icon:'user'
-                },
-            },
-            {
-                path:'/acl/role',
-                component:()=>import('@/views/acl/role/index.vue'),
-                name:'role',
-                meta:{
-                    title:'角色管理',
-                    icon:'Avatar'
-                },
-            },
-            {
-                path:'/acl/menu',
-                component:()=>import('@/views/acl/menu/index.vue'),
-                name:'permission',
-                meta:{
-                    title:'菜单管理',
-                    icon:'Grid'
-                },
-            },
-        ]
-    },
 
-    // 商品管理路由
-
-    {
-        path:'/product',
-        component:()=>import('@/views/home/index.vue'),
-        name:'product',
-        meta:{
-            title:'商品管理',
-            icon:'Shop'
-        },
-        redirect:'/product/trademark',
-        children:[
-            {
-                path:'/product/trademark',
-                component:()=>import('@/views/product/trademark/index.vue'),
-                name:'trademark',
-                meta:{
-                    title:'品牌管理',
-                    icon:'Flag'
-                },
-            },
-            {
-                path:'/product/attr',
-                component:()=>import('@/views/product/attr/index.vue'),
-                name:'attr',
-                meta:{
-                    title:'属性管理',
-                    icon:'PriceTag'
-                },
-            },
-            {
-                path:'/product/sku',
-                component:()=>import('@/views/product/sku/index.vue'),
-                name:'sku',
-                meta:{
-                    title:'sku管理',
-                    icon:'Key'
-                },
-            },
-            {
-                path:'/product/spu',
-                component:()=>import('@/views/product/spu/index.vue'),
-                name:'spu',
-                meta:{
-                    title:'spu管理',
-                    icon:'MagicStick'
-                },
-            },
-        ]
-    },
 
     //设置 
     {
@@ -181,5 +74,119 @@ export  const constantRoutes = [
             },
             
         ]
+    },
+]
+// 动态，异步路由
+export const asyncRoutes = [
+    // 权限管理路由
+    {
+        path:'/acl',
+        component:()=>import('@/views/home/index.vue'),
+        name:'Acl',
+        meta:{
+            title:'权限管理',
+            icon:'Operation'
+        },
+        redirect:'/acl/user',
+        children:[
+            {
+                path:'/acl/user',
+                component:()=>import('@/views/acl/user/index.vue'),
+                name:'User',
+                meta:{
+                    title:'用户管理',
+                    icon:'user'
+                },
+            },
+            {
+                path:'/acl/role',
+                component:()=>import('@/views/acl/role/index.vue'),
+                name:'Role',
+                meta:{
+                    title:'角色管理',
+                    icon:'Avatar'
+                },
+            },
+            {
+                path:'/acl/menu',
+                component:()=>import('@/views/acl/menu/index.vue'),
+                name:'Permission',
+                meta:{
+                    title:'菜单管理',
+                    icon:'Grid'
+                },
+            },
+        ]
+    },
+
+    // 商品管理路由
+    {
+        path:'/product',
+        component:()=>import('@/views/home/index.vue'),
+        name:'Product',
+        meta:{
+            title:'商品管理',
+            icon:'Shop'
+        },
+        redirect:'/product/trademark',
+        children:[
+            {
+                path:'/product/trademark',
+                component:()=>import('@/views/product/trademark/index.vue'),
+                name:'Trademark',
+                meta:{
+                    title:'品牌管理',
+                    icon:'Flag'
+                },
+            },
+            {
+                path:'/product/attr',
+                component:()=>import('@/views/product/attr/index.vue'),
+                name:'Attr',
+                meta:{
+                    title:'属性管理',
+                    icon:'PriceTag'
+                },
+            },
+            {
+                path:'/product/sku',
+                component:()=>import('@/views/product/sku/index.vue'),
+                name:'Sku',
+                meta:{
+                    title:'sku管理',
+                    icon:'Key'
+                },
+            },
+            {
+                path:'/product/spu',
+                component:()=>import('@/views/product/spu/index.vue'),
+                name:'Spu',
+                meta:{
+                    title:'spu管理',
+                    icon:'MagicStick'
+                },
+            },
+        ]
+    },
+]
+// 静态路由，所有人都能访问
+export const anyRoutes =[
+    {
+        path:'/404',
+        component:()=>import('@/views/404/index.vue'),
+        name:'404',
+        meta:{
+            title:'404',
+            hidden:true,
+        },
+    },
+    {
+        path:'/:pathMatch(.*)*',
+        redirect:'/404',
+        name:'Any',
+        meta:{
+            title:'无效地址',
+            hidden:true,
+        },
     },
 ]

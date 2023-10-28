@@ -36,7 +36,7 @@ router.beforeEach(async (to, from, next) => {
                 // 没有则重新获取信息
                 try {
                     await userStore.UserInfo()
-                    next()
+                    next({...to})
                 } catch (err) {
                     // token过期/无效/修改
                     await userStore.Userlogout()
